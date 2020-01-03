@@ -1,4 +1,4 @@
-package com.srl.labelspinnergit
+package com.srl.labelspinner
 
 import org.junit.Test
 

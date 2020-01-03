@@ -1,4 +1,4 @@
-package com.srl.labelspinnergit
+package com.srl.labelspinner
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
