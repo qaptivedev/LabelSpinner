@@ -2,7 +2,6 @@ package com.srl.labelspinnerlibrary
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.RelativeLayout
 
 class LabelSpinner : RelativeLayout {
@@ -21,6 +20,6 @@ class LabelSpinner : RelativeLayout {
 
     fun init(context: Context, attrs: AttributeSet?, defStyle: Int?)
     {
-        View.inflate(context,R.layout.lable_spinner_layout,this)
+        inflate(context,R.layout.lable_spinner_layout,this)
     }
 }
