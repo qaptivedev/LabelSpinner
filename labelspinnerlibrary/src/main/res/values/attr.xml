@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="LabelSpinner">
+        <!-- label -->
+        <attr name="label" format="string"/>
+        <!-- style for label TextInputLayout styles-->
+        <attr name="labelStyle" format="reference"/>
+        <!-- The prompt to display when the spinner's dialog is shown. -->
+        <attr name="prompt" format="reference" />
+        <!-- Display mode for spinner options. -->
+        <attr name="spinnerMode" format="enum">
+            <!-- Spinner options will be presented to the user as a dialog window. -->
+            <enum name="dialog" value="0" />
+            <!-- Spinner options will be presented to the user as an inline dropdown
+                 anchored to the spinner widget itself. -->
+            <enum name="dropdown" value="1" />
+        </attr>
+        <!-- List selector to use for spinnerMode="dropdown" display. -->
+        <attr name="dropDownSelector" />
+        <!-- Theme to use for the drop-down or dialog popup window. -->
+        <attr name="popupTheme" />
+        <!-- Background drawable to use for the dropdown in spinnerMode="dropdown". -->
+        <attr name="popupBackground" />
+        <!-- Window elevation to use for the dropdown in spinnerMode="dropdown". -->
+        <attr name="popupElevation" />
+        <!-- Width of the dropdown in spinnerMode="dropdown". -->
+        <attr name="dropDownWidth" />
+        <!-- Reference to a layout to use for displaying a prompt in the dropdown for
+             spinnerMode="dropdown". This layout must contain a TextView with the id
+             {@code @android:id/text1} to be populated with the prompt text. -->
+        <attr name="popupPromptView" format="reference" />
+        <!-- Gravity setting for positioning the currently selected item. -->
+        <attr name="gravity" />
+        <!-- Whether this spinner should mark child views as enabled/disabled when
+             the spinner itself is enabled/disabled. -->
+        <attr name="disableChildrenWhenDisabled" format="boolean" />
+    </declare-styleable>
+</resources>
