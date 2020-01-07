@@ -1,14 +1,17 @@
 package com.srl.labelspinnerlibrary
 
 import android.content.Context
-import android.graphics.Rect
+import android.content.DialogInterface
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
 import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.ListPopupWindow
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.srl.labelspinnerlibrary.ViewUtils.isVisibleForUser
 import kotlinx.android.synthetic.main.lable_spinner_layout.view.*
 
@@ -20,6 +23,8 @@ class LabelSpinner @JvmOverloads constructor(
     var mode: Int = -1
 ) :
     RelativeLayout(context, attrs, defStyleAttr, defStyleRes) {
+
+    val TAG=this.javaClass.simpleName
 
     var mOnItemSelectedListener: OnItemSelectedListener? = null
     var mAdapter: BaseAdapter? = null
@@ -36,6 +41,8 @@ class LabelSpinner @JvmOverloads constructor(
      * Use a dropdown anchored to the Spinner for selecting spinner options.
      */
     val MODE_DROPDOWN = 1
+
+    var selectedPossition=-1
 
     /**
      * Use the theme-supplied value to select the dropdown mode.
@@ -71,17 +78,18 @@ class LabelSpinner @JvmOverloads constructor(
             )
         }
         val popupThemeResId = typedArray.getResourceId(R.styleable.LabelSpinner_popupTheme, 0)
-        if (popupThemeResId != 0) {
-            mPopupContext = ContextThemeWrapper(context, popupThemeResId)
+        mPopupContext = if (popupThemeResId != 0) {
+            ContextThemeWrapper(context, popupThemeResId)
         } else {
-            mPopupContext = context
+            context
         }
         if (mode == MODE_THEME) {
             mode = typedArray.getInt(R.styleable.LabelSpinner_spinnerMode, MODE_DIALOG)
         }
         when (mode) {
             MODE_DIALOG -> {
-
+                mPopup =DialogPopup()
+                mPopup?.setPromptText(typedArray.getString(R.styleable.LabelSpinner_prompt))
             }
             MODE_DROPDOWN -> {
                 val popup = DropdownPopup(mPopupContext, attrs, defStyleAttr, defStyleRes)
@@ -95,38 +103,39 @@ class LabelSpinner @JvmOverloads constructor(
                     R.styleable.LabelSpinner_dropDownWidth,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)
-                {
-                    if(popTypedArray.hasValueOrEmpty(R.styleable.LabelSpinner_dropDownSelector))
-                    {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                    if (popTypedArray.hasValueOrEmpty(R.styleable.LabelSpinner_dropDownSelector)) {
                         popup.setListSelector(popTypedArray.getDrawable(R.styleable.LabelSpinner_dropDownSelector))
                     }
-                }
-                else{
-                    val drawable=popTypedArray.getDrawable(R.styleable.LabelSpinner_dropDownSelector)
-                    if(drawable!=null)
-                    {
+                } else {
+                    val drawable =
+                        popTypedArray.getDrawable(R.styleable.LabelSpinner_dropDownSelector)
+                    if (drawable != null) {
                         popup.setListSelector(drawable)
                     }
                 }
                 popup.setBackgroundDrawable(popTypedArray.getDrawable(R.styleable.LabelSpinner_popupBackground))
                 popup.setPromptText(typedArray.getString(R.styleable.LabelSpinner_prompt))
                 popTypedArray.recycle()
-                mPopup=popup
+                mPopup = popup
             }
         }
-        mGravity=typedArray.getInt(R.styleable.LabelSpinner_gravity,Gravity.CENTER)
-        mDisableChildrenWhenDisabled=typedArray.getBoolean(R.styleable.LabelSpinner_disableChildrenWhenDisabled,false)
+        mGravity = typedArray.getInt(R.styleable.LabelSpinner_gravity, Gravity.CENTER)
+        mDisableChildrenWhenDisabled =
+            typedArray.getBoolean(R.styleable.LabelSpinner_disableChildrenWhenDisabled, false)
+
+        text_input_layout.hint = typedArray.getString(R.styleable.LabelSpinner_label)
+
         typedArray.recycle()
-        if(mTempAdapter!=null)
-        {
+        if (mTempAdapter != null) {
             setAdapter(mTempAdapter!!)
-            mTempAdapter=null
+            mTempAdapter = null
         }
 
-        text_input_edit_text.setOnTouchListener(object : View.OnTouchListener{
+        text_input_edit_text.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                mPopup?.show(textDirection,textAlignment)
+                if(event?.action==MotionEvent.ACTION_UP)
+                    mPopup?.show(textDirection, textAlignment)
                 return true
             }
         })
@@ -135,9 +144,8 @@ class LabelSpinner @JvmOverloads constructor(
     fun setAdapter(adapter: BaseAdapter) {
         // The super constructor may call setAdapter before we're prepared.
         // Postpone doing anything until we've finished construction.
-        if(mPopup==null)
-        {
-            mTempAdapter=adapter
+        if (mPopup == null) {
+            mTempAdapter = adapter
             return
         }
         this.mAdapter = adapter
@@ -145,8 +153,8 @@ class LabelSpinner @JvmOverloads constructor(
     }
 
 
-    private fun setSelection(parent: AdapterView<*>?,view: View?, position: Int, id: Long)
-    {
+    private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        selectedPossition=position
         text_input_edit_text.setText(parent?.adapter?.getItem(position).toString())
     }
 
@@ -203,7 +211,7 @@ class LabelSpinner @JvmOverloads constructor(
             isModal = true
             promptPosition = android.widget.ListPopupWindow.POSITION_PROMPT_ABOVE
             setOnItemClickListener { parent, view, position, id ->
-                setSelection(parent,view,position,id)
+                setSelection(parent, view, position, id)
                 mOnItemSelectedListener?.onItemSelected(parent, view, position, id)
                 dismiss()
             }
@@ -261,4 +269,82 @@ class LabelSpinner @JvmOverloads constructor(
         }
     }
 
+    inner class DialogPopup:SpinnerPopup,DialogInterface.OnClickListener{
+        private var mPopupAlert: AlertDialog? = null
+        private var mListAdapter: ListAdapter? = null
+        private var mPrompt: CharSequence? = null
+
+        override fun setAdapter(adapter: ListAdapter?) {
+            mListAdapter=adapter
+        }
+
+        override fun show(textDirection: Int, textAlignment: Int) {
+            if(mListAdapter==null)
+            {
+                return
+            }
+            val builder=MaterialAlertDialogBuilder(mPopupContext)
+            if(mPrompt!=null)
+            {
+                builder.setTitle(mPrompt)
+            }
+            builder.setSingleChoiceItems(mListAdapter,selectedPossition,this)
+            mPopupAlert=builder.create()
+            val listView=mPopupAlert?.listView
+            listView?.textDirection=textDirection
+            listView?.textAlignment=textAlignment
+            mPopupAlert?.show()
+            postDelayed({
+                mPopupAlert?.dismiss()
+            },3*1000)
+        }
+
+        override fun dismiss() {
+            mPopupAlert?.dismiss()
+            mPopupAlert = null
+        }
+
+        override fun isShowing(): Boolean {
+            return mPopupAlert?.isShowing?:false
+        }
+
+        override fun setPromptText(hintText: CharSequence?) {
+            mPrompt=hintText
+        }
+
+        override fun getHintText(): CharSequence? {
+            return mPrompt
+        }
+
+        override fun setBackgroundDrawable(bg: Drawable?) {
+            Log.e(TAG, "Cannot set popup background for MODE_DIALOG, ignoring")
+        }
+
+        override fun setVerticalOffset(px: Int) {
+            Log.e(TAG, "Cannot set vertical offset for MODE_DIALOG, ignoring")
+        }
+
+        override fun setHorizontalOffset(px: Int) {
+            Log.e(TAG, "Cannot set horizontal offset for MODE_DIALOG, ignoring")
+        }
+
+        override fun getBackground(): Drawable? {
+            return null
+        }
+
+        override fun getVerticalOffset(): Int {
+            return 0
+        }
+
+        override fun getHorizontalOffset(): Int {
+            return 0
+        }
+
+        override fun onClick(dialog: DialogInterface?, which: Int) {
+            setSelection(mPopupAlert?.listView, mPopupAlert?.listView?.selectedView, which, mListAdapter!!.getItemId(which))
+            mOnItemSelectedListener?.onItemSelected(mPopupAlert?.listView, mPopupAlert?.listView?.selectedView, which, mListAdapter!!.getItemId(which))
+            dismiss()
+        }
+
+    }
 }

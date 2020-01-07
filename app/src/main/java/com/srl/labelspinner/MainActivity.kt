@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         adapter.add("Hello")
         adapter.add("you")
         adapter.add("TERF")
-//        spinner.setAdapter(adapter)
+        spinner.setAdapter(adapter)
 //        spinner.setOnItemSelectedListener()
         label_spinner.setAdapter(adapter)
     }
