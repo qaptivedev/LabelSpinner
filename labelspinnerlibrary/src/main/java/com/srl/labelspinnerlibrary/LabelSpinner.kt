@@ -14,8 +14,8 @@ import androidx.appcompat.widget.ListPopupWindow
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.theme.overlay.MaterialThemeOverlay.wrap
 import com.srl.labelspinnerlibrary.ViewUtils.isVisibleForUser
+import kotlinx.android.synthetic.main.lable_spinner_layout.view.*
 
 class LabelSpinner @JvmOverloads constructor(
     context: Context,
@@ -25,8 +25,6 @@ class LabelSpinner @JvmOverloads constructor(
     var mode: Int = -1
 ) :
     RelativeLayout(context, attrs, defStyleAttr, defStyleRes) {
-
-    private val DEF_STYLE_RES = com.google.android.material.R.styleable.TextInputLayout
 
     val TAG=this.javaClass.simpleName
 
@@ -63,14 +61,8 @@ class LabelSpinner @JvmOverloads constructor(
     private var mGravity = 0
     private var mDisableChildrenWhenDisabled = false
 
-    lateinit var textInputEditText:TextInputEditText
-    lateinit var textInputLayout:TextInputLayout
-
     init {
-        createView(context, attrs, defStyleAttr, defStyleRes)
-//        inflate(context, R.layout.lable_spinner_layout, this)
-//        textInputLayout=text_input_layout
-//        textInputEditText=text_input_edit_text
+        inflate(context, R.layout.lable_spinner_layout, this)
         val typedArray = context.obtainStyledAttributes(
             attrs,
             R.styleable.LabelSpinner,
@@ -134,7 +126,7 @@ class LabelSpinner @JvmOverloads constructor(
         mDisableChildrenWhenDisabled =
             typedArray.getBoolean(R.styleable.LabelSpinner_disableChildrenWhenDisabled, false)
 
-        textInputLayout.hint = typedArray.getString(R.styleable.LabelSpinner_label)
+        text_input_layout.hint = typedArray.getString(R.styleable.LabelSpinner_label)
 
         typedArray.recycle()
         if (mTempAdapter != null) {
@@ -142,7 +134,7 @@ class LabelSpinner @JvmOverloads constructor(
             mTempAdapter = null
         }
 
-        textInputEditText.setOnTouchListener(object : View.OnTouchListener {
+        text_input_edit_text.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 if(event?.action==MotionEvent.ACTION_UP)
                     mPopup?.show(textDirection, textAlignment)
@@ -165,33 +157,8 @@ class LabelSpinner @JvmOverloads constructor(
 
     private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         selectedPossition=position
-        textInputEditText.setText(parent?.adapter?.getItem(position).toString())
+        text_input_edit_text.setText(parent?.adapter?.getItem(position).toString())
     }
-
-    fun createView(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0)
-    {
-        var typedArray = context.obtainStyledAttributes(
-                attrs,
-        R.styleable.LabelSpinner,
-        defStyleAttr,
-        defStyleRes
-        )
-        val labelStyle=typedArray.getResourceId(R.styleable.LabelSpinner_labelStyle, 0)
-        if(labelStyle>0)
-        {
-            typedArray = context.theme.obtainStyledAttributes(labelStyle, DEF_STYLE_RES)
-        }
-        textInputLayout= TextInputLayout(context)
-        textInputLayout
-//        textInputLayout= TextInputLayout(context)
-        val params= LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT)
-        addView(textInputLayout,params)
-        val inParam=LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT)
-        textInputEditText=TextInputEditText(context)
-        textInputLayout.addView(textInputEditText,inParam)
-        typedArray.recycle()
-    }
-
 
     /**
      * Implements some sort of popup selection interface for selecting a spinner option.
