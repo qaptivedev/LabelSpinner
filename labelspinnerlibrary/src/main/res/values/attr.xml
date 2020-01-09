@@ -4,8 +4,6 @@
     <declare-styleable name="LabelSpinner">
         <!-- label -->
         <attr name="label" format="string"/>
-        <!-- style for label TextInputLayout styles-->
-        <attr name="labelStyle" format="reference"/>
         <!-- The prompt to display when the spinner's dialog is shown. -->
         <attr name="prompt" format="reference" />
         <!-- Display mode for spinner options. -->
@@ -35,5 +33,21 @@
         <!-- Whether this spinner should mark child views as enabled/disabled when
              the spinner itself is enabled/disabled. -->
         <attr name="disableChildrenWhenDisabled" format="boolean" />
+
+        <!-- InputLayout Styles-->
+        <attr name="labelType" format="enum">
+            <enum name="floating" value="1"/>
+            <enum name="outline" value="2"/>
+        </attr>
+        
+        <attr name="backgroundBoxColor" format="color"/>
+        <attr name="cornerBoxRadiusTopStart" format="float"/>
+        <attr name="cornerBoxRadiusTopEnd" format="float"/>
+        <attr name="cornerBoxRadiusBottomStart" format="float"/>
+        <attr name="cornerBoxRadiusBottomEnd" format="float"/>
+        <attr name="strokeBoxColor" format="color"/>
+        <attr name="errorText" format="string"/>
+        <attr name="errorTextAppearance" format="reference"/>
+
     </declare-styleable>
 </resources>

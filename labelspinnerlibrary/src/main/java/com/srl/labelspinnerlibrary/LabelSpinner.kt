@@ -2,20 +2,23 @@ package com.srl.labelspinnerlibrary
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
+import android.util.TypedValue
 import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
+import androidx.annotation.ColorInt
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.ListPopupWindow
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.srl.labelspinnerlibrary.ViewUtils.isVisibleForUser
 import kotlinx.android.synthetic.main.lable_spinner_layout.view.*
+
 
 class LabelSpinner @JvmOverloads constructor(
     context: Context,
@@ -26,7 +29,7 @@ class LabelSpinner @JvmOverloads constructor(
 ) :
     RelativeLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    val TAG=this.javaClass.simpleName
+    val TAG = this.javaClass.simpleName
 
     var mOnItemSelectedListener: OnItemSelectedListener? = null
     var mAdapter: BaseAdapter? = null
@@ -44,7 +47,7 @@ class LabelSpinner @JvmOverloads constructor(
      */
     val MODE_DROPDOWN = 1
 
-    var selectedPossition=-1
+    var selectedPossition = -1
 
     /**
      * Use the theme-supplied value to select the dropdown mode.
@@ -60,6 +63,11 @@ class LabelSpinner @JvmOverloads constructor(
 
     private var mGravity = 0
     private var mDisableChildrenWhenDisabled = false
+
+    enum class LabelType(var value: Int) {
+        FLOATING(1),
+        OUTLINE(2)
+    }
 
     init {
         inflate(context, R.layout.lable_spinner_layout, this)
@@ -79,6 +87,7 @@ class LabelSpinner @JvmOverloads constructor(
                 defStyleRes
             )
         }
+        setStyle(context, attrs, defStyleAttr, defStyleRes)
         val popupThemeResId = typedArray.getResourceId(R.styleable.LabelSpinner_popupTheme, 0)
         mPopupContext = if (popupThemeResId != 0) {
             ContextThemeWrapper(context, popupThemeResId)
@@ -90,7 +99,7 @@ class LabelSpinner @JvmOverloads constructor(
         }
         when (mode) {
             MODE_DIALOG -> {
-                mPopup =DialogPopup()
+                mPopup = DialogPopup()
                 mPopup?.setPromptText(typedArray.getString(R.styleable.LabelSpinner_prompt))
             }
             MODE_DROPDOWN -> {
@@ -136,7 +145,7 @@ class LabelSpinner @JvmOverloads constructor(
 
         text_input_edit_text.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-                if(event?.action==MotionEvent.ACTION_UP)
+                if (event?.action == MotionEvent.ACTION_UP)
                     mPopup?.show(textDirection, textAlignment)
                 return true
             }
@@ -156,8 +165,101 @@ class LabelSpinner @JvmOverloads constructor(
 
 
     private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        selectedPossition=position
+        selectedPossition = position
         text_input_edit_text.setText(parent?.adapter?.getItem(position).toString())
+    }
+
+    fun setStyle(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0,
+        defStyleRes: Int = 0
+    ) {
+        val typedArray = context.obtainStyledAttributes(
+            attrs,
+            R.styleable.LabelSpinner,
+            defStyleAttr,
+            defStyleRes
+        )
+        val labelType = typedArray.getInt(R.styleable.LabelSpinner_labelType, LabelType.FLOATING.value)
+        setSetBoxBackgroundMode(
+            when (labelType) {
+                LabelType.FLOATING.value -> {
+                    LabelType.FLOATING
+                }
+                LabelType.OUTLINE.value -> {
+                    LabelType.OUTLINE
+                }
+                else -> {
+                    LabelType.FLOATING
+                }
+            }
+        )
+        val boxBackgroundColor =
+            typedArray.getColor(R.styleable.LabelSpinner_backgroundBoxColor, -1)
+        val boxCornerRadiusTopStart =
+            typedArray.getFloat(R.styleable.LabelSpinner_cornerBoxRadiusTopStart, 0.0F)
+        val boxCornerRadiusTopEnd =
+            typedArray.getFloat(R.styleable.LabelSpinner_cornerBoxRadiusTopEnd, 0.0F)
+        val boxCornerRadiusBottomStart =
+            typedArray.getFloat(R.styleable.LabelSpinner_cornerBoxRadiusBottomStart, 0.0F)
+        val boxCornerRadiusBottomEnd =
+            typedArray.getFloat(R.styleable.LabelSpinner_cornerBoxRadiusBottomEnd, 0.0F)
+        val boxStrokeColor = typedArray.getColor(R.styleable.LabelSpinner_backgroundBoxColor,-1)
+        val errorTextAppearance =
+            typedArray.getResourceId(R.styleable.LabelSpinner_errorTextAppearance, -1)
+        if (boxBackgroundColor != -1) {
+            setBoxBackgroundColor(boxBackgroundColor)
+        }
+        else{
+            setBoxBackgroundColor(Color.TRANSPARENT)
+        }
+        if(boxStrokeColor!=-1)
+        {
+            setBoxStrokeColor(boxStrokeColor)
+        }
+        else
+        {
+            val typedValue = TypedValue()
+            context.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true)
+            val color = typedValue.data
+            setBoxStrokeColor(color)
+        }
+        if(errorTextAppearance!=-1)
+        {
+            setErrorTextAppearance(errorTextAppearance)
+        }
+        setBoxCornerRadii(boxCornerRadiusTopStart,boxCornerRadiusTopEnd,boxCornerRadiusBottomStart,boxCornerRadiusBottomEnd)
+        typedArray.recycle()
+    }
+
+    fun setBoxBackgroundColor(@ColorInt colorInt: Int) {
+        text_input_layout.boxBackgroundColor = colorInt
+        text_input_layout.boxBackgroundColor=Color.TRANSPARENT
+    }
+
+    fun setSetBoxBackgroundMode(type: LabelType) {
+        text_input_layout.boxBackgroundMode=type.value
+        when(type)
+        {
+            LabelType.OUTLINE->{
+
+            }
+        }
+    }
+
+    fun setBoxStrokeColor(@ColorInt colorInt: Int) {
+        text_input_layout.boxStrokeColor=colorInt
+    }
+
+    fun setErrorTextAppearance(@StyleRes errorTextAppearance:Int)
+    {
+        text_input_layout.setErrorTextAppearance(errorTextAppearance)
+    }
+
+    fun setBoxCornerRadii(boxCornerRadiusTopStart:Float,boxCornerRadiusTopEnd:Float,boxCornerRadiusBottomStart:Float,boxCornerRadiusBottomEnd:Float)
+    {
+        text_input_layout.setBoxCornerRadii(boxCornerRadiusTopStart,boxCornerRadiusTopEnd,boxCornerRadiusBottomStart,boxCornerRadiusBottomEnd)
     }
 
     /**
@@ -270,34 +372,32 @@ class LabelSpinner @JvmOverloads constructor(
         }
     }
 
-    inner class DialogPopup:SpinnerPopup,DialogInterface.OnClickListener{
+    inner class DialogPopup : SpinnerPopup, DialogInterface.OnClickListener {
         private var mPopupAlert: AlertDialog? = null
         private var mListAdapter: ListAdapter? = null
         private var mPrompt: CharSequence? = null
 
         override fun setAdapter(adapter: ListAdapter?) {
-            mListAdapter=adapter
+            mListAdapter = adapter
         }
 
         override fun show(textDirection: Int, textAlignment: Int) {
-            if(mListAdapter==null)
-            {
+            if (mListAdapter == null) {
                 return
             }
-            val builder=MaterialAlertDialogBuilder(mPopupContext)
-            if(mPrompt!=null)
-            {
+            val builder = MaterialAlertDialogBuilder(mPopupContext)
+            if (mPrompt != null) {
                 builder.setTitle(mPrompt)
             }
-            builder.setSingleChoiceItems(mListAdapter,selectedPossition,this)
-            mPopupAlert=builder.create()
-            val listView=mPopupAlert?.listView
-            listView?.textDirection=textDirection
-            listView?.textAlignment=textAlignment
+            builder.setSingleChoiceItems(mListAdapter, selectedPossition, this)
+            mPopupAlert = builder.create()
+            val listView = mPopupAlert?.listView
+            listView?.textDirection = textDirection
+            listView?.textAlignment = textAlignment
             mPopupAlert?.show()
             postDelayed({
                 mPopupAlert?.dismiss()
-            },3*1000)
+            }, 3 * 1000)
         }
 
         override fun dismiss() {
@@ -306,11 +406,11 @@ class LabelSpinner @JvmOverloads constructor(
         }
 
         override fun isShowing(): Boolean {
-            return mPopupAlert?.isShowing?:false
+            return mPopupAlert?.isShowing ?: false
         }
 
         override fun setPromptText(hintText: CharSequence?) {
-            mPrompt=hintText
+            mPrompt = hintText
         }
 
         override fun getHintText(): CharSequence? {
@@ -342,8 +442,18 @@ class LabelSpinner @JvmOverloads constructor(
         }
 
         override fun onClick(dialog: DialogInterface?, which: Int) {
-            setSelection(mPopupAlert?.listView, mPopupAlert?.listView?.selectedView, which, mListAdapter!!.getItemId(which))
-            mOnItemSelectedListener?.onItemSelected(mPopupAlert?.listView, mPopupAlert?.listView?.selectedView, which, mListAdapter!!.getItemId(which))
+            setSelection(
+                mPopupAlert?.listView,
+                mPopupAlert?.listView?.selectedView,
+                which,
+                mListAdapter!!.getItemId(which)
+            )
+            mOnItemSelectedListener?.onItemSelected(
+                mPopupAlert?.listView,
+                mPopupAlert?.listView?.selectedView,
+                which,
+                mListAdapter!!.getItemId(which)
+            )
             dismiss()
         }
 
