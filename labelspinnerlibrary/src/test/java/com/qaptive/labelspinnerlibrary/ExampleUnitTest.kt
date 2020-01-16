@@ -1,4 +1,4 @@
-package com.srl.labelspinner
+package com.qaptive.labelspinnerlibrary
 
 import org.junit.Test
 

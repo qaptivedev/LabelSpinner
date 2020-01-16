@@ -1,4 +1,4 @@
-package com.srl.labelspinnerlibrary
+package com.qaptive.labelspinnerlibrary
 
 import android.content.Context
 import android.content.DialogInterface
@@ -14,7 +14,7 @@ import androidx.appcompat.widget.ListPopupWindow
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.srl.labelspinnerlibrary.ViewUtils.isVisibleForUser
+import com.qaptive.labelspinnerlibrary.ViewUtils.isVisibleForUser
 
 
 class LabelSpinner @JvmOverloads constructor(

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.srl.labelspinnerlibrary.LabelSpinner
+    <com.qaptive.labelspinnerlibrary.LabelSpinner
         android:id="@+id/label_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/guideline"/>
 
-    <com.srl.labelspinnerlibrary.LabelSpinner
+    <com.qaptive.labelspinnerlibrary.LabelSpinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

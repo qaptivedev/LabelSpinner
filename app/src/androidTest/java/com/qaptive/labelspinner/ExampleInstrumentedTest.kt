@@ -1,4 +1,4 @@
-package com.srl.labelspinnerlibrary
+package com.qaptive.labelspinner
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.srl.labelspinnerlibrary.test", appContext.packageName)
+        assertEquals("com.srl.labelspinnergit", appContext.packageName)
     }
 }

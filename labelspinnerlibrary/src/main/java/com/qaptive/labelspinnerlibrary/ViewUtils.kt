@@ -1,4 +1,4 @@
-package com.srl.labelspinnerlibrary
+package com.qaptive.labelspinnerlibrary
 
 import android.content.res.Resources
 import android.graphics.Rect

@@ -3,7 +3,7 @@ Spinner with InputTextLayout style hint.Usage is almost same as the spinner.
 # Usage 
 ## With outline
 ```
-<com.srl.labelspinnerlibrary.LabelSpinner
+<com.qaptive.labelspinnerlibrary.LabelSpinner
         android:id="@+id/label_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@ Spinner with InputTextLayout style hint.Usage is almost same as the spinner.
 ## With Floating Label
 ```
 
-    <com.srl.labelspinnerlibrary.LabelSpinner
+    <com.qaptive.labelspinnerlibrary.LabelSpinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
