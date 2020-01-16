@@ -45,13 +45,13 @@ def getVersionName = { ->
 }
 
 def getArtificatId = { ->
-    return "labelspinnerlibrary" // Replace with library name ID
+    return "labelspinnerlibrary"
 }
 
 publishing {
     publications {
         bar(MavenPublication) {
-            groupId 'com.enefce.libraries' // Replace with group ID
+            groupId 'com.qaptive.labelspinnerlibrary'
             artifactId getArtificatId()
             version getVersionName()
             artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
