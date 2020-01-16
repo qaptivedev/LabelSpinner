@@ -1,5 +1,5 @@
 # LabelSpinner
-Spinner with InputTextLayout style hint.
+Spinner with InputTextLayout style hint.Usage is almost same as the spinner.
 # Usage 
 ## With outline
 ```
@@ -28,6 +28,14 @@ Spinner with InputTextLayout style hint.
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline"
         app:layout_constraintBottom_toBottomOf="parent"/>
+```
+##Set Adapter
+```
+val adapter=ArrayAdapter<String>(this,R.layout.support_simple_spinner_dropdown_item)
+        adapter.add("Hello")
+        adapter.add("you")
+        adapter.add("TERF")
+        spinner.setAdapter(adapter)
 ```
 ## Styling
 Override
