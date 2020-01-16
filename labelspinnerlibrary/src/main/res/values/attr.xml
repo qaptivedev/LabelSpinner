@@ -39,15 +39,6 @@
             <enum name="floating" value="1"/>
             <enum name="outline" value="2"/>
         </attr>
-        
-        <attr name="backgroundBoxColor" format="color"/>
-        <attr name="cornerBoxRadiusTopStart" format="float"/>
-        <attr name="cornerBoxRadiusTopEnd" format="float"/>
-        <attr name="cornerBoxRadiusBottomStart" format="float"/>
-        <attr name="cornerBoxRadiusBottomEnd" format="float"/>
-        <attr name="strokeBoxColor" format="color"/>
-        <attr name="errorText" format="string"/>
-        <attr name="errorTextAppearance" format="reference"/>
 
     </declare-styleable>
 </resources>
