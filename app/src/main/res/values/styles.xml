@@ -8,10 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="InputOutline" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">?attr/colorSecondary</item>
-        <item name="hintTextColor">?attr/colorSecondary</item>
-        <item name="boxStrokeErrorColor">?attr/colorError</item>
+    <style name="LabelSpinner.FilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">@android:color/transparent</item>
     </style>
 
 </resources>
