@@ -36,6 +36,23 @@ val adapter=ArrayAdapter<String>(this,R.layout.support_simple_spinner_dropdown_i
         adapter.add("you")
         adapter.add("TERF")
         spinner.setAdapter(adapter)
+        
+spinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                Toast.makeText(this@MainActivity,"onNothingSelected",Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                Toast.makeText(this@MainActivity,"position:$position, id:$id",Toast.LENGTH_SHORT).show()
+            }
+
+        }
+        )
 ```
 ## Styling
 Override
