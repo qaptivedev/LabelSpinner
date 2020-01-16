@@ -28,7 +28,7 @@ class LabelSpinner @JvmOverloads constructor(
 
     val TAG = this.javaClass.simpleName
 
-    var mOnItemSelectedListener: OnItemSelectedListener? = null
+    private var mOnItemSelectedListener: OnItemSelectedListener? = null
     var mAdapter: BaseAdapter? = null
 
     /** Context used to inflate the popup window or dialog.  */
@@ -196,6 +196,11 @@ class LabelSpinner @JvmOverloads constructor(
         textInputLayout=rootView.findViewById(R.id.text_input_layout)
         textInputEditText=rootView.findViewById(R.id.text_input_edit_text)
         typedArray.recycle()
+    }
+
+    fun setOnItemSelectedListener(listener:OnItemSelectedListener?)
+    {
+        mOnItemSelectedListener=listener
     }
 
     /**
