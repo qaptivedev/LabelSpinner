@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Outline" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"/>
+    <style name="LabelSpinner.Outline" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox"/>
+    <style name="LabelSpinner.FilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox"/>
 </resources>

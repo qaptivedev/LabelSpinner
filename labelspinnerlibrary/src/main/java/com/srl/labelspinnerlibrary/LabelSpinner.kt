@@ -2,22 +2,19 @@ package com.srl.labelspinnerlibrary
 
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
-import android.util.TypedValue
 import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
-import androidx.annotation.ColorInt
-import androidx.annotation.StyleRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.ListPopupWindow
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.srl.labelspinnerlibrary.ViewUtils.isVisibleForUser
-import kotlinx.android.synthetic.main.lable_spinner_layout.view.*
 
 
 class LabelSpinner @JvmOverloads constructor(
@@ -64,13 +61,16 @@ class LabelSpinner @JvmOverloads constructor(
     private var mGravity = 0
     private var mDisableChildrenWhenDisabled = false
 
+    lateinit var textInputEditText: TextInputEditText
+    lateinit var textInputLayout: TextInputLayout
+
     enum class LabelType(var value: Int) {
         FLOATING(1),
         OUTLINE(2)
     }
 
     init {
-        inflate(context, R.layout.lable_spinner_layout, this)
+        inflateLayout(context, attrs, defStyleAttr, defStyleRes)
         val typedArray = context.obtainStyledAttributes(
             attrs,
             R.styleable.LabelSpinner,
@@ -87,7 +87,6 @@ class LabelSpinner @JvmOverloads constructor(
                 defStyleRes
             )
         }
-        setStyle(context, attrs, defStyleAttr, defStyleRes)
         val popupThemeResId = typedArray.getResourceId(R.styleable.LabelSpinner_popupTheme, 0)
         mPopupContext = if (popupThemeResId != 0) {
             ContextThemeWrapper(context, popupThemeResId)
@@ -135,7 +134,7 @@ class LabelSpinner @JvmOverloads constructor(
         mDisableChildrenWhenDisabled =
             typedArray.getBoolean(R.styleable.LabelSpinner_disableChildrenWhenDisabled, false)
 
-        text_input_layout.hint = typedArray.getString(R.styleable.LabelSpinner_label)
+        textInputLayout.hint = typedArray.getString(R.styleable.LabelSpinner_label)
 
         typedArray.recycle()
         if (mTempAdapter != null) {
@@ -143,7 +142,7 @@ class LabelSpinner @JvmOverloads constructor(
             mTempAdapter = null
         }
 
-        text_input_edit_text.setOnTouchListener(object : View.OnTouchListener {
+        textInputEditText.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 if (event?.action == MotionEvent.ACTION_UP)
                     mPopup?.show(textDirection, textAlignment)
@@ -166,10 +165,10 @@ class LabelSpinner @JvmOverloads constructor(
 
     private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         selectedPossition = position
-        text_input_edit_text.setText(parent?.adapter?.getItem(position).toString())
+        textInputEditText.setText(parent?.adapter?.getItem(position).toString())
     }
 
-    fun setStyle(
+    private fun inflateLayout(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0,
@@ -181,85 +180,22 @@ class LabelSpinner @JvmOverloads constructor(
             defStyleAttr,
             defStyleRes
         )
-        val labelType = typedArray.getInt(R.styleable.LabelSpinner_labelType, LabelType.FLOATING.value)
-        setSetBoxBackgroundMode(
-            when (labelType) {
-                LabelType.FLOATING.value -> {
-                    LabelType.FLOATING
-                }
-                LabelType.OUTLINE.value -> {
-                    LabelType.OUTLINE
-                }
-                else -> {
-                    LabelType.FLOATING
-                }
+        val labelType =
+            typedArray.getInt(R.styleable.LabelSpinner_labelType, LabelType.FLOATING.value)
+        val rootView = when (labelType) {
+            LabelType.FLOATING.value -> {
+                inflate(context, R.layout.lable_spinner_layout_filled, this)
             }
-        )
-        val boxBackgroundColor =
-            typedArray.getColor(R.styleable.LabelSpinner_backgroundBoxColor, -1)
-        val boxCornerRadiusTopStart =
-            typedArray.getFloat(R.styleable.LabelSpinner_cornerBoxRadiusTopStart, 0.0F)
-        val boxCornerRadiusTopEnd =
-            typedArray.getFloat(R.styleable.LabelSpinner_cornerBoxRadiusTopEnd, 0.0F)
-        val boxCornerRadiusBottomStart =
-            typedArray.getFloat(R.styleable.LabelSpinner_cornerBoxRadiusBottomStart, 0.0F)
-        val boxCornerRadiusBottomEnd =
-            typedArray.getFloat(R.styleable.LabelSpinner_cornerBoxRadiusBottomEnd, 0.0F)
-        val boxStrokeColor = typedArray.getColor(R.styleable.LabelSpinner_backgroundBoxColor,-1)
-        val errorTextAppearance =
-            typedArray.getResourceId(R.styleable.LabelSpinner_errorTextAppearance, -1)
-        if (boxBackgroundColor != -1) {
-            setBoxBackgroundColor(boxBackgroundColor)
+            LabelType.OUTLINE.value -> {
+                inflate(context, R.layout.lable_spinner_layout_outline, this)
+            }
+            else -> {
+                inflate(context, R.layout.lable_spinner_layout_filled, this)
+            }
         }
-        else{
-            setBoxBackgroundColor(Color.TRANSPARENT)
-        }
-        if(boxStrokeColor!=-1)
-        {
-            setBoxStrokeColor(boxStrokeColor)
-        }
-        else
-        {
-            val typedValue = TypedValue()
-            context.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true)
-            val color = typedValue.data
-            setBoxStrokeColor(color)
-        }
-        if(errorTextAppearance!=-1)
-        {
-            setErrorTextAppearance(errorTextAppearance)
-        }
-        setBoxCornerRadii(boxCornerRadiusTopStart,boxCornerRadiusTopEnd,boxCornerRadiusBottomStart,boxCornerRadiusBottomEnd)
+        textInputLayout=rootView.findViewById(R.id.text_input_layout)
+        textInputEditText=rootView.findViewById(R.id.text_input_edit_text)
         typedArray.recycle()
-    }
-
-    fun setBoxBackgroundColor(@ColorInt colorInt: Int) {
-        text_input_layout.boxBackgroundColor = colorInt
-        text_input_layout.boxBackgroundColor=Color.TRANSPARENT
-    }
-
-    fun setSetBoxBackgroundMode(type: LabelType) {
-        text_input_layout.boxBackgroundMode=type.value
-        when(type)
-        {
-            LabelType.OUTLINE->{
-
-            }
-        }
-    }
-
-    fun setBoxStrokeColor(@ColorInt colorInt: Int) {
-        text_input_layout.boxStrokeColor=colorInt
-    }
-
-    fun setErrorTextAppearance(@StyleRes errorTextAppearance:Int)
-    {
-        text_input_layout.setErrorTextAppearance(errorTextAppearance)
-    }
-
-    fun setBoxCornerRadii(boxCornerRadiusTopStart:Float,boxCornerRadiusTopEnd:Float,boxCornerRadiusBottomStart:Float,boxCornerRadiusBottomEnd:Float)
-    {
-        text_input_layout.setBoxCornerRadii(boxCornerRadiusTopStart,boxCornerRadiusTopEnd,boxCornerRadiusBottomStart,boxCornerRadiusBottomEnd)
     }
 
     /**
