@@ -2,10 +2,12 @@ package com.qaptive.labelspinnerlibrary
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
+import android.util.TypedValue
 import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
@@ -44,7 +46,7 @@ class LabelSpinner @JvmOverloads constructor(
      */
     val MODE_DROPDOWN = 1
 
-    var selectedPossition = -1
+    private var selectedPosition = -1
 
     /**
      * Use the theme-supplied value to select the dropdown mode.
@@ -124,7 +126,12 @@ class LabelSpinner @JvmOverloads constructor(
                         popup.setListSelector(drawable)
                     }
                 }
-                popup.setBackgroundDrawable(popTypedArray.getDrawable(R.styleable.LabelSpinner_popupBackground))
+                var popupBackground=popTypedArray.getDrawable(R.styleable.LabelSpinner_popupBackground)
+                if(popupBackground==null)
+                {
+                    popupBackground = ColorDrawable(getSurfaceColor())
+                }
+                popup.setBackgroundDrawable(popupBackground)
                 popup.setPromptText(typedArray.getString(R.styleable.LabelSpinner_prompt))
                 popTypedArray.recycle()
                 mPopup = popup
@@ -134,7 +141,7 @@ class LabelSpinner @JvmOverloads constructor(
         mDisableChildrenWhenDisabled =
             typedArray.getBoolean(R.styleable.LabelSpinner_disableChildrenWhenDisabled, false)
 
-        textInputLayout.hint = typedArray.getString(R.styleable.LabelSpinner_label)
+        setLabel(typedArray.getString(R.styleable.LabelSpinner_label))
 
         typedArray.recycle()
         if (mTempAdapter != null) {
@@ -151,6 +158,13 @@ class LabelSpinner @JvmOverloads constructor(
         })
     }
 
+    fun getSurfaceColor():Int
+    {
+        val value = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorSurface, value, true)
+        return value.data
+    }
+
     fun setAdapter(adapter: BaseAdapter) {
         // The super constructor may call setAdapter before we're prepared.
         // Postpone doing anything until we've finished construction.
@@ -164,9 +178,44 @@ class LabelSpinner @JvmOverloads constructor(
 
 
     private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        selectedPossition = position
+        selectedPosition = position
         textInputEditText.setText(parent?.adapter?.getItem(position).toString())
     }
+
+    public fun setSelection(position: Int){
+        if ((mAdapter?.count?:0)<=position)
+        {
+            throw ArrayIndexOutOfBoundsException(position)
+        }
+        selectedPosition = position
+        textInputEditText.setText(mAdapter?.getItem(position).toString())
+    }
+
+    public fun clearSelection()
+    {
+
+    }
+
+    public fun setLabel(hint:CharSequence?)
+    {
+        textInputLayout.hint=hint
+    }
+
+    public fun getLabel():CharSequence?
+    {
+        return textInputLayout.hint
+    }
+
+    public fun setError(hint:CharSequence?)
+    {
+        textInputLayout.error=hint
+    }
+
+    public fun getError():CharSequence?
+    {
+        return textInputLayout.error
+    }
+
 
     private fun inflateLayout(
         context: Context,
@@ -330,7 +379,7 @@ class LabelSpinner @JvmOverloads constructor(
             if (mPrompt != null) {
                 builder.setTitle(mPrompt)
             }
-            builder.setSingleChoiceItems(mListAdapter, selectedPossition, this)
+            builder.setSingleChoiceItems(mListAdapter, selectedPosition, this)
             mPopupAlert = builder.create()
             val listView = mPopupAlert?.listView
             listView?.textDirection = textDirection

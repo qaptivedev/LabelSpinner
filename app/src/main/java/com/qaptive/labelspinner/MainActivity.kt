@@ -1,11 +1,11 @@
 package com.qaptive.labelspinner
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         spinner.setAdapter(adapter)
 //        spinner.setOnItemSelectedListener()
         label_spinner.setAdapter(adapter)
+        label_spinner.setSelection(1)
         label_spinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 Toast.makeText(this@MainActivity,"onNothingSelected",Toast.LENGTH_SHORT).show()
