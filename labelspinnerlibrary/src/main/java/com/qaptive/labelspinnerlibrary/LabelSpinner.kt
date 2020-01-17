@@ -147,7 +147,7 @@ class LabelSpinner @JvmOverloads constructor(
 
         typedArray.recycle()
         if (mTempAdapter != null) {
-            setAdapter(mTempAdapter!!)
+            setAdapterInternal(mTempAdapter!!)
             mTempAdapter = null
         }
 
@@ -167,7 +167,7 @@ class LabelSpinner @JvmOverloads constructor(
         return value.data
     }
 
-    fun setAdapter(adapter: BaseAdapter) {
+    fun <T> setAdapter(adapter: T) where T : BaseAdapter?, T : LabelBaseAdapter? {
         // The super constructor may call setAdapter before we're prepared.
         // Postpone doing anything until we've finished construction.
         if (mPopup == null) {
@@ -178,12 +178,22 @@ class LabelSpinner @JvmOverloads constructor(
         mPopup?.setAdapter(adapter)
     }
 
-
-    private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        selectedPosition = position
-        textInputEditText.setText(parent?.adapter?.getItem(position).toString())
-        setError(null)
+    private fun setAdapterInternal(adapter:BaseAdapter)
+    {
+        if (mPopup == null) {
+            mTempAdapter = adapter
+            return
+        }
+        this.mAdapter = adapter
+        mPopup?.setAdapter(adapter)
     }
+
+
+//    private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//        selectedPosition = position
+//        textInputEditText.setText(mAdapter?.getDisplayText(position))
+//        setError(null)
+//    }
 
     fun setSelection(position: Int){
         if ((mAdapter?.count?:0)<=position)
@@ -191,7 +201,11 @@ class LabelSpinner @JvmOverloads constructor(
             throw ArrayIndexOutOfBoundsException(position)
         }
         selectedPosition = position
-        textInputEditText.setText(mAdapter?.getItem(position).toString())
+        val tmpAdatper=mAdapter
+        if(tmpAdatper is LabelBaseAdapter) {
+            textInputEditText.setText(tmpAdatper.getDisplayText(position))
+        }
+        setError(null)
     }
 
     fun clearSelection()
@@ -317,7 +331,7 @@ class LabelSpinner @JvmOverloads constructor(
             isModal = true
             promptPosition = android.widget.ListPopupWindow.POSITION_PROMPT_ABOVE
             setOnItemClickListener { parent, view, position, id ->
-                setSelection(parent, view, position, id)
+                this@LabelSpinner.setSelection( position)
                 mOnItemSelectedListener?.onItemSelected(parent, view, position, id)
                 dismiss()
             }
@@ -442,12 +456,7 @@ class LabelSpinner @JvmOverloads constructor(
         }
 
         override fun onClick(dialog: DialogInterface?, which: Int) {
-            setSelection(
-                mPopupAlert?.listView,
-                mPopupAlert?.listView?.selectedView,
-                which,
-                mListAdapter!!.getItemId(which)
-            )
+            setSelection(which)
             mOnItemSelectedListener?.onItemSelected(
                 mPopupAlert?.listView,
                 mPopupAlert?.listView?.selectedView,
