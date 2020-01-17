@@ -37,5 +37,15 @@ class MainActivity : AppCompatActivity() {
 
         }
         )
+        error_btn.setOnClickListener {
+            label_spinner.setError("Error")
+            spinner.setError("Error",true)
+        }
+        clear_btn.setOnClickListener {
+            label_spinner.setError(null)
+            label_spinner.clearSelection()
+            spinner.setError(null)
+            spinner.clearSelection()
+        }
     }
 }

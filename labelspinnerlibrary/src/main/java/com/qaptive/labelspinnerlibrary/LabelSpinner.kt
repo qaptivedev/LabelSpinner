@@ -30,6 +30,8 @@ class LabelSpinner @JvmOverloads constructor(
 
     val TAG = this.javaClass.simpleName
 
+    val NULL_TEXT= ""
+
     private var mOnItemSelectedListener: OnItemSelectedListener? = null
     var mAdapter: BaseAdapter? = null
 
@@ -158,7 +160,7 @@ class LabelSpinner @JvmOverloads constructor(
         })
     }
 
-    fun getSurfaceColor():Int
+    private fun getSurfaceColor():Int
     {
         val value = TypedValue()
         context.theme.resolveAttribute(R.attr.colorSurface, value, true)
@@ -180,9 +182,10 @@ class LabelSpinner @JvmOverloads constructor(
     private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         selectedPosition = position
         textInputEditText.setText(parent?.adapter?.getItem(position).toString())
+        setError(null)
     }
 
-    public fun setSelection(position: Int){
+    fun setSelection(position: Int){
         if ((mAdapter?.count?:0)<=position)
         {
             throw ArrayIndexOutOfBoundsException(position)
@@ -191,27 +194,37 @@ class LabelSpinner @JvmOverloads constructor(
         textInputEditText.setText(mAdapter?.getItem(position).toString())
     }
 
-    public fun clearSelection()
+    fun clearSelection()
     {
-
+        selectedPosition=-1
+        textInputEditText.setText(NULL_TEXT)
     }
 
-    public fun setLabel(hint:CharSequence?)
+    fun setLabel(hint:CharSequence?)
     {
         textInputLayout.hint=hint
     }
 
-    public fun getLabel():CharSequence?
+    fun getLabel():CharSequence?
     {
         return textInputLayout.hint
     }
 
-    public fun setError(hint:CharSequence?)
+    fun setError(hint:CharSequence?,inInputLayout:Boolean=false)
     {
-        textInputLayout.error=hint
+        if(hint==null)
+        {
+            textInputLayout.error=null
+            textInputEditText.error=null
+            return
+        }
+        if(inInputLayout)
+            textInputLayout.error=hint
+        else
+            textInputEditText.error=hint
     }
 
-    public fun getError():CharSequence?
+    fun getError():CharSequence?
     {
         return textInputLayout.error
     }
@@ -385,9 +398,6 @@ class LabelSpinner @JvmOverloads constructor(
             listView?.textDirection = textDirection
             listView?.textAlignment = textAlignment
             mPopupAlert?.show()
-            postDelayed({
-                mPopupAlert?.dismiss()
-            }, 3 * 1000)
         }
 
         override fun dismiss() {
