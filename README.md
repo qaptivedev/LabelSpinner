@@ -47,7 +47,7 @@ In App build.gradle add
 dependencies {
     ......
     ........
-    implementation 'com.qaptive.labelspinnerlibrary:labelspinnerlibrary:0.0.1'
+    implementation 'com.qaptive.labelspinnerlibrary:labelspinnerlibrary:1.0.0-alpha-0'
     }
 ```
 ## With outline
@@ -79,8 +79,9 @@ dependencies {
         app:layout_constraintBottom_toBottomOf="parent"/>
 ```
 ##Set Adapter
+Adapter need to implement LabelBaseAdapter and must be sub class of BaseAdapter.
 ```
-val adapter=ArrayAdapter<String>(this,R.layout.support_simple_spinner_dropdown_item)
+val adapter=LabelArrayAdapter<String>(this,R.layout.support_simple_spinner_dropdown_item)
         adapter.add("Hello")
         adapter.add("you")
         adapter.add("TERF")

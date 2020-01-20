@@ -2,10 +2,12 @@ package com.qaptive.labelspinnerlibrary
 
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
+import android.util.TypedValue
 import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
@@ -28,6 +30,8 @@ class LabelSpinner @JvmOverloads constructor(
 
     val TAG = this.javaClass.simpleName
 
+    val NULL_TEXT= ""
+
     private var mOnItemSelectedListener: OnItemSelectedListener? = null
     var mAdapter: BaseAdapter? = null
 
@@ -44,7 +48,7 @@ class LabelSpinner @JvmOverloads constructor(
      */
     val MODE_DROPDOWN = 1
 
-    var selectedPossition = -1
+    private var selectedPosition = -1
 
     /**
      * Use the theme-supplied value to select the dropdown mode.
@@ -124,7 +128,12 @@ class LabelSpinner @JvmOverloads constructor(
                         popup.setListSelector(drawable)
                     }
                 }
-                popup.setBackgroundDrawable(popTypedArray.getDrawable(R.styleable.LabelSpinner_popupBackground))
+                var popupBackground=popTypedArray.getDrawable(R.styleable.LabelSpinner_popupBackground)
+                if(popupBackground==null)
+                {
+                    popupBackground = ColorDrawable(getSurfaceColor())
+                }
+                popup.setBackgroundDrawable(popupBackground)
                 popup.setPromptText(typedArray.getString(R.styleable.LabelSpinner_prompt))
                 popTypedArray.recycle()
                 mPopup = popup
@@ -134,11 +143,11 @@ class LabelSpinner @JvmOverloads constructor(
         mDisableChildrenWhenDisabled =
             typedArray.getBoolean(R.styleable.LabelSpinner_disableChildrenWhenDisabled, false)
 
-        textInputLayout.hint = typedArray.getString(R.styleable.LabelSpinner_label)
+        setLabel(typedArray.getString(R.styleable.LabelSpinner_label))
 
         typedArray.recycle()
         if (mTempAdapter != null) {
-            setAdapter(mTempAdapter!!)
+            setAdapterInternal(mTempAdapter!!)
             mTempAdapter = null
         }
 
@@ -151,7 +160,14 @@ class LabelSpinner @JvmOverloads constructor(
         })
     }
 
-    fun setAdapter(adapter: BaseAdapter) {
+    private fun getSurfaceColor():Int
+    {
+        val value = TypedValue()
+        context.theme.resolveAttribute(R.attr.colorSurface, value, true)
+        return value.data
+    }
+
+    fun <T> setAdapter(adapter: T) where T : BaseAdapter?, T : LabelBaseAdapter? {
         // The super constructor may call setAdapter before we're prepared.
         // Postpone doing anything until we've finished construction.
         if (mPopup == null) {
@@ -162,11 +178,71 @@ class LabelSpinner @JvmOverloads constructor(
         mPopup?.setAdapter(adapter)
     }
 
-
-    private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        selectedPossition = position
-        textInputEditText.setText(parent?.adapter?.getItem(position).toString())
+    private fun setAdapterInternal(adapter:BaseAdapter)
+    {
+        if (mPopup == null) {
+            mTempAdapter = adapter
+            return
+        }
+        this.mAdapter = adapter
+        mPopup?.setAdapter(adapter)
     }
+
+
+//    private fun setSelection(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//        selectedPosition = position
+//        textInputEditText.setText(mAdapter?.getDisplayText(position))
+//        setError(null)
+//    }
+
+    fun setSelection(position: Int){
+        if ((mAdapter?.count?:0)<=position)
+        {
+            throw ArrayIndexOutOfBoundsException(position)
+        }
+        selectedPosition = position
+        val tmpAdatper=mAdapter
+        if(tmpAdatper is LabelBaseAdapter) {
+            textInputEditText.setText(tmpAdatper.getDisplayText(position))
+        }
+        setError(null)
+    }
+
+    fun clearSelection()
+    {
+        selectedPosition=-1
+        textInputEditText.setText(NULL_TEXT)
+    }
+
+    fun setLabel(hint:CharSequence?)
+    {
+        textInputLayout.hint=hint
+    }
+
+    fun getLabel():CharSequence?
+    {
+        return textInputLayout.hint
+    }
+
+    fun setError(hint:CharSequence?,inInputLayout:Boolean=false)
+    {
+        if(hint==null)
+        {
+            textInputLayout.error=null
+            textInputEditText.error=null
+            return
+        }
+        if(inInputLayout)
+            textInputLayout.error=hint
+        else
+            textInputEditText.error=hint
+    }
+
+    fun getError():CharSequence?
+    {
+        return textInputLayout.error
+    }
+
 
     private fun inflateLayout(
         context: Context,
@@ -255,7 +331,7 @@ class LabelSpinner @JvmOverloads constructor(
             isModal = true
             promptPosition = android.widget.ListPopupWindow.POSITION_PROMPT_ABOVE
             setOnItemClickListener { parent, view, position, id ->
-                setSelection(parent, view, position, id)
+                this@LabelSpinner.setSelection( position)
                 mOnItemSelectedListener?.onItemSelected(parent, view, position, id)
                 dismiss()
             }
@@ -330,15 +406,12 @@ class LabelSpinner @JvmOverloads constructor(
             if (mPrompt != null) {
                 builder.setTitle(mPrompt)
             }
-            builder.setSingleChoiceItems(mListAdapter, selectedPossition, this)
+            builder.setSingleChoiceItems(mListAdapter, selectedPosition, this)
             mPopupAlert = builder.create()
             val listView = mPopupAlert?.listView
             listView?.textDirection = textDirection
             listView?.textAlignment = textAlignment
             mPopupAlert?.show()
-            postDelayed({
-                mPopupAlert?.dismiss()
-            }, 3 * 1000)
         }
 
         override fun dismiss() {
@@ -383,12 +456,7 @@ class LabelSpinner @JvmOverloads constructor(
         }
 
         override fun onClick(dialog: DialogInterface?, which: Int) {
-            setSelection(
-                mPopupAlert?.listView,
-                mPopupAlert?.listView?.selectedView,
-                which,
-                mListAdapter!!.getItemId(which)
-            )
+            setSelection(which)
             mOnItemSelectedListener?.onItemSelected(
                 mPopupAlert?.listView,
                 mPopupAlert?.listView?.selectedView,
