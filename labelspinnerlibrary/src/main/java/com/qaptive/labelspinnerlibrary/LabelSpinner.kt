@@ -155,7 +155,8 @@ class LabelSpinner @JvmOverloads constructor(
         textInputEditText.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 if (event?.action == MotionEvent.ACTION_UP)
-                    mPopup?.show(textDirection, textAlignment)
+                    if (isEnabled)
+                        mPopup?.show(textDirection, textAlignment)
                 return true
             }
         })
