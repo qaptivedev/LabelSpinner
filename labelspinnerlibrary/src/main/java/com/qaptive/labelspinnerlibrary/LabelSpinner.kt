@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.qaptive.labelspinnerlibrary.ViewUtils.isVisibleForUser
+import java.util.*
 
 
 class LabelSpinner @JvmOverloads constructor(
@@ -154,7 +155,8 @@ class LabelSpinner @JvmOverloads constructor(
         textInputEditText.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 if (event?.action == MotionEvent.ACTION_UP)
-                    mPopup?.show(textDirection, textAlignment)
+                    if (isEnabled)
+                        mPopup?.show(textDirection, textAlignment)
                 return true
             }
         })
@@ -241,6 +243,13 @@ class LabelSpinner @JvmOverloads constructor(
     fun getError():CharSequence?
     {
         return textInputLayout.error
+    }
+
+    fun getItemSelected(): Object? {
+        return if (selectedPosition<0 || mAdapter?.count?:0<selectedPosition){
+            null
+        }else
+            mAdapter?.getItem(selectedPosition) as Object?
     }
 
 
