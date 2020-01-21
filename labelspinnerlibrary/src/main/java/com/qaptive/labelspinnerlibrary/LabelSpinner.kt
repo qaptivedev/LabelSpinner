@@ -17,7 +17,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.qaptive.labelspinnerlibrary.ViewUtils.isVisibleForUser
-import java.util.*
 
 
 class LabelSpinner @JvmOverloads constructor(
