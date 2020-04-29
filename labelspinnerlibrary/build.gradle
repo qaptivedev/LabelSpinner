@@ -48,12 +48,18 @@ def getArtificatId = { ->
     return "labelspinnerlibrary"
 }
 
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
 publishing {
     publications {
         bar(MavenPublication) {
             groupId 'com.qaptive.labelspinnerlibrary'
             artifactId getArtificatId()
             version getVersionName()
+            artifact(sourceJar)
             artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
         }
     }
