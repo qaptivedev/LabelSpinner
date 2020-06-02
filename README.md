@@ -47,7 +47,7 @@ In App build.gradle add
 dependencies {
     ......
     ........
-    implementation 'com.qaptive.labelspinnerlibrary:labelspinnerlibrary:1.0.0-alpha-2'
+    implementation 'com.qaptive.labelspinnerlibrary:labelspinnerlibrary:1.0.0-beta-1'
     }
 ```
 ## With outline
