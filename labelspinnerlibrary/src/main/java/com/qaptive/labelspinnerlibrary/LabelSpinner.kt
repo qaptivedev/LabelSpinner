@@ -11,6 +11,7 @@ import android.util.TypedValue
 import android.view.*
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
+import androidx.annotation.CallSuper
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.ListPopupWindow
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -196,7 +197,8 @@ open class LabelSpinner @JvmOverloads constructor(
 //        setError(null)
 //    }
 
-    fun setSelection(position: Int){
+    @CallSuper
+    open fun setSelection(position: Int){
         if ((mAdapter?.count?:0)<=position)
         {
             throw ArrayIndexOutOfBoundsException(position)
@@ -209,7 +211,8 @@ open class LabelSpinner @JvmOverloads constructor(
         setError(null)
     }
 
-    fun clearSelection()
+    @CallSuper
+    open fun clearSelection()
     {
         selectedPosition=-1
         textInputEditText.setText(NULL_TEXT)
@@ -225,7 +228,8 @@ open class LabelSpinner @JvmOverloads constructor(
         return textInputLayout.hint
     }
 
-    fun setError(hint:CharSequence?,inInputLayout:Boolean=false)
+    @CallSuper
+    open fun setError(hint:CharSequence?,inInputLayout:Boolean=false)
     {
         if(hint==null)
         {
