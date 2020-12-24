@@ -3,7 +3,7 @@ package com.qaptive.labelspinnerlibrary
 import android.content.Context
 import android.widget.ArrayAdapter
 
-class LabelArrayAdapter<T>(
+open class LabelArrayAdapter<T>(
     context: Context,
     resource: Int,
     textViewResourceId: Int=0

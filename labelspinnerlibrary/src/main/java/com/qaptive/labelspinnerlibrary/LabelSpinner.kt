@@ -19,7 +19,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.qaptive.labelspinnerlibrary.ViewUtils.isVisibleForUser
 
 
-class LabelSpinner @JvmOverloads constructor(
+open class LabelSpinner @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
